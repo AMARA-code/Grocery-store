@@ -1,6 +1,6 @@
 # FreshCart – Grocery E‑commerce
 
-FreshCart is a modern **grocery e‑commerce storefront** built with **React, TypeScript, and Vite**. It provides a complete browse → details → cart → checkout → order confirmation flow suitable for real-world online grocery stores.
+It is a modern **grocery e‑commerce storefront** built with **React, TypeScript, and Vite**. It provides a complete browse → details → cart → checkout → order confirmation flow suitable for real-world online grocery stores.
 
 ## Tech stack
 
