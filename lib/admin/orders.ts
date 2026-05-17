@@ -1,8 +1,7 @@
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { isSupabaseServerConfigured } from "@/lib/supabase/env";
-import type { AdminOrderRow } from "@/types";
 
-export async function getAdminOrders(): Promise<AdminOrderRow[]> {
+export async function getAdminOrders() {
   if (!isSupabaseServerConfigured()) return [];
 
   try {
@@ -19,18 +18,18 @@ export async function getAdminOrders(): Promise<AdminOrderRow[]> {
     if (error || !data) return [];
 
     return data.map((row) => ({
-      id: row.id as string,
-      status: row.status as string,
-      total: row.total as number | null,
-      created_at: row.created_at as string,
-      customerName: (row.customer_name as string | null) ?? null,
-      customerEmail: (row.customer_email as string | null) ?? null,
-      customerPhone: (row.customer_phone as string | null) ?? null,
-      shippingAddress: (row.shipping_address as string | null) ?? null,
-      itemsSummary: (row.items_summary as string | null) ?? null,
-      paymentMethod: (row.payment_method as string | null) ?? null,
-      paymentProvider: (row.payment_provider as string | null) ?? null,
-      transactionId: (row.transaction_id as string | null) ?? null,
+      id:               row.id               as string,
+      status:           row.status           as string,
+      total:            row.total            as number | null,
+      created_at:       row.created_at       as string,
+      customer_name:    row.customer_name    as string | null,
+      customer_email:   row.customer_email   as string | null,
+      customer_phone:   row.customer_phone   as string | null,
+      shipping_address: row.shipping_address as string | null,
+      items_summary:    row.items_summary    as string | null,
+      payment_method:   row.payment_method   as string | null,
+      payment_provider: row.payment_provider as string | null,
+      transaction_id:   row.transaction_id   as string | null,
     }));
   } catch {
     return [];
