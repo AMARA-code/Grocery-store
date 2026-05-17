@@ -2,13 +2,13 @@ import { Routes, Route } from "react-router-dom";
 import { Toaster } from "react-hot-toast";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
-import Home from "./pages/Home";
-import Products from "./pages/Products";
-import ProductDetails from "./pages/ProductDetails";
-import CartPage from "./pages/Cart";
-import Checkout from "./pages/Checkout";
-import OrderConfirmation from "./pages/OrderConfirmation";
-import Contact from "./pages/Contact";
+import Home from "./views/Home";
+import Products from "./views/Products";
+import ProductDetails from "./views/ProductDetails";
+import CartPage from "./views/Cart";
+import Checkout from "./views/Checkout";
+import OrderConfirmation from "./views/OrderConfirmation";
+import Contact from "./views/Contact";
 
 function App() {
   return (
