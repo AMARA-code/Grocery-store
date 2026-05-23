@@ -63,13 +63,14 @@ export async function placeOrder(
   const orderId = order.id as string;
 
   // 4. Insert order_items rows
-  const orderItems = items.map((item) => ({
-    order_id:     orderId,
-    product_id:   parseProductUuid(item.id),   // null if not a UUID (safe)
-    product_name: item.name,
-    quantity:     item.quantity,
-    price:        item.price,
-  }));
+// 4. Insert order_items rows
+const orderItems = items.map((item) => ({
+  order_id:     orderId,
+  product_id:   parseProductUuid(item.id) ?? null,  // null is now allowed
+  product_name: item.name,
+  quantity:     item.quantity,
+  price:        item.price,
+}));
 
   const { error: itemsError } = await supabase
     .from("order_items")

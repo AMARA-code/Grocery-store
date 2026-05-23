@@ -8,14 +8,14 @@ import {
   useState,
   ReactNode
 } from "react";
-import { Product } from "../data/products";
+import type { ProductRow } from "@/types";            // ← was Product from static file
 import { loadFromStorage, saveToStorage } from "../utils/storage";
 
 export interface CartItem {
   id: string;
   name: string;
   price: number;
-  image: string;
+  image_url: string;                                  // ← was image
   quantity: number;
 }
 
@@ -23,7 +23,7 @@ interface CartContextValue {
   items: CartItem[];
   totalItems: number;
   totalPrice: number;
-  addToCart: (product: Product, quantity?: number) => void;
+  addToCart: (product: ProductRow, quantity?: number) => void;  // ← was Product
   removeFromCart: (id: string) => void;
   updateQuantity: (id: string, quantity: number) => void;
   clearCart: () => void;
@@ -42,7 +42,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
     saveToStorage(STORAGE_KEY, items);
   }, [items]);
 
-  const addToCart = (product: Product, quantity = 1) => {
+  const addToCart = (product: ProductRow, quantity = 1) => {  // ← was Product
     setItems((prev) => {
       const existing = prev.find((item) => item.id === product.id);
       if (existing) {
@@ -58,7 +58,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
           id: product.id,
           name: product.name,
           price: product.price,
-          image: product.image,
+          image_url: product.image_url ?? "/placeholder.jpg",  // ← was product.image
           quantity
         }
       ];
@@ -112,4 +112,3 @@ export function useCart(): CartContextValue {
   }
   return ctx;
 }
-

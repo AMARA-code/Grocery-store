@@ -1,6 +1,6 @@
-import type { Product } from "@/src/data/products";
+import type { ProductRow } from "@/types";
 
-export function ProductInquiryForm({ product }: { product: Product }) {
+export function ProductInquiryForm({ product }: { product: ProductRow }) {
   return (
     <div className="mt-10 rounded-2xl border border-gray-100 bg-green-50/40 p-6 shadow-inner">
       <h2 className="text-lg font-semibold text-gray-900">Ask about this product</h2>

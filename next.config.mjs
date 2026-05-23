@@ -1,7 +1,3 @@
-/**
- * Next.js 14 loads config from .mjs/.js only (not .ts).
- * When you upgrade to Next 15+, you can rename this file to `next.config.ts`.
- */
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
@@ -9,7 +5,7 @@ const nextConfig = {
     remotePatterns: [
       {
         protocol: "https",
-        hostname: "**.supabase.co",
+        hostname: "jjehedfmkegxlchazjey.supabase.co",  // ← exact hostname, no wildcard
         pathname: "/storage/v1/object/public/**",
       },
       {

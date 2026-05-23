@@ -1,6 +1,6 @@
 "use client";
 
-import { type FormEvent, useState } from "react";
+import { type FormEvent, useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import { useCart } from "@/hooks/useCart";
@@ -18,9 +18,12 @@ import type {
 export function CheckoutForm() {
   const { items, totalPrice, clearCart } = useCart();
   const router = useRouter();
+  const [mounted, setMounted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>("cod");
   const [paymentProvider, setPaymentProvider] = useState<PaymentProvider>("jazzcash");
+
+  useEffect(() => setMounted(true), []);
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -216,9 +219,18 @@ export function CheckoutForm() {
         </section>
       </div>
 
+      {/* ── Order summary aside ── */}
       <aside className="h-fit space-y-4 rounded-2xl border border-gray-100 bg-white p-6 shadow-md">
         <h2 className="text-lg font-semibold text-gray-900">Order summary</h2>
-        {items.length === 0 ? (
+
+        {/* Skeleton until client hydrates */}
+        {!mounted ? (
+          <div className="space-y-2 animate-pulse">
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="h-6 rounded bg-gray-100" />
+            ))}
+          </div>
+        ) : items.length === 0 ? (
           <p className="text-sm text-gray-600">Your cart is empty.</p>
         ) : (
           <>

@@ -1,15 +1,23 @@
 import { notFound } from "next/navigation";
-import { products } from "@/src/data/products";
+import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { ProductDetail } from "@/components/store/ProductDetail";
+import type { ProductRow } from "@/types";
 
-/** Avoid pre-rendering 28 product pages (large images caused local build OOM). */
 export const dynamic = "force-dynamic";
 
 type PageProps = { params: { id: string } };
 
-export default function ProductDetailsPage({ params }: PageProps) {
+export default async function ProductDetailsPage({ params }: PageProps) {
   const { id } = params;
-  const product = products.find((p) => p.id === id);
-  if (!product) notFound();
-  return <ProductDetail product={product} />;
+
+  const supabase = await createSupabaseServerClient(); // ← await
+  const { data: product, error } = await supabase
+    .from("products")
+    .select("*")
+    .eq("id", id)
+    .single();
+
+  if (error || !product) notFound();
+
+  return <ProductDetail product={product as ProductRow} />;
 }

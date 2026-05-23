@@ -27,7 +27,6 @@ function parseBody(body: unknown): ContactRequestBody | null {
 }
 
 export async function POST(request: Request) {
-  // Rate-limit hint via IP (logged to Supabase row, not enforced at edge here)
   const ip =
     request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
     request.headers.get("x-real-ip") ||
@@ -56,7 +55,7 @@ export async function POST(request: Request) {
   }
 
   try {
-    const supabase = createSupabaseServerClient();
+    const supabase = await createSupabaseServerClient(); // ← await
 
     const { error } = await supabase.from("contact_messages").insert({
       name: parsed.name,

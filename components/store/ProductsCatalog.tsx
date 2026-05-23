@@ -4,9 +4,11 @@ import { useMemo, useState, useEffect, useRef } from "react";
 import { useSearchParams } from "next/navigation";
 import { motion, useScroll, useTransform, useSpring, AnimatePresence } from "framer-motion";
 import { Sparkles, SlidersHorizontal, X, Star, ChevronLeft, ChevronRight } from "lucide-react";
-import { products, type Category } from "@/src/data/products";
+import { type Category } from "@/src/data/products"; // only the type, not the array
 import { CategoryFilters } from "@/components/store/CategoryFilters";
 import { ProductGrid } from "@/components/store/ProductGrid";
+import { createSupabaseBrowserClient } from "@/lib/supabase/client";
+import type { ProductRow } from "@/types";
 
 /* ─────────────────────────────────────────
    SCROLL-LINKED SHOPPING CHARACTER
@@ -168,14 +170,12 @@ function HeroImagePanel() {
 
   return (
     <div className="relative h-full flex flex-col gap-3">
-      {/* Rating badge */}
       <div className="absolute top-3 right-3 z-20 flex items-center gap-1.5 rounded-full bg-white/95 shadow-md px-3 py-1.5 backdrop-blur-sm">
         <Star className="h-3.5 w-3.5 fill-amber-400 text-amber-400" />
         <span className="text-xs font-bold text-stone-800">4.9</span>
         <span className="text-xs text-stone-400">/ 5.0</span>
       </div>
 
-      {/* Main image */}
       <div className="relative flex-1 overflow-hidden rounded-2xl min-h-[220px]">
         <AnimatePresence custom={direction} mode="popLayout">
           <motion.div
@@ -188,11 +188,8 @@ function HeroImagePanel() {
             transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
             className="absolute inset-0"
           >
-            <img
-              src={heroImages[active].src}
-              alt={heroImages[active].label}
-              className="absolute inset-0 w-full h-full object-cover"
-            />
+            <img src={heroImages[active].src} alt={heroImages[active].label}
+              className="absolute inset-0 w-full h-full object-cover" />
             <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent" />
             <div className="absolute bottom-3 left-3">
               <span className="rounded-full bg-white/90 backdrop-blur-sm px-3 py-1 text-xs font-semibold text-stone-700 shadow-sm">
@@ -202,44 +199,29 @@ function HeroImagePanel() {
           </motion.div>
         </AnimatePresence>
 
-        <button
-          onClick={prev}
+        <button onClick={prev}
           className="absolute left-2 top-1/2 -translate-y-1/2 z-10 flex h-7 w-7 items-center justify-center rounded-full bg-white/80 backdrop-blur-sm shadow-md text-stone-600 hover:bg-white transition"
-          aria-label="Previous image"
-        >
+          aria-label="Previous image">
           <ChevronLeft className="h-4 w-4" />
         </button>
-        <button
-          onClick={next}
+        <button onClick={next}
           className="absolute right-2 top-1/2 -translate-y-1/2 z-10 flex h-7 w-7 items-center justify-center rounded-full bg-white/80 backdrop-blur-sm shadow-md text-stone-600 hover:bg-white transition"
-          aria-label="Next image"
-        >
+          aria-label="Next image">
           <ChevronRight className="h-4 w-4" />
         </button>
       </div>
 
-      {/* Thumbnails + availability pill */}
       <div className="flex items-center gap-3">
         <div className="flex gap-2">
           {thumbnailImages.map((img, i) => (
-            <button
-              key={i}
-              onClick={() => goTo(i + 1)}
+            <button key={i} onClick={() => goTo(i + 1)}
               className={`relative h-14 w-14 overflow-hidden rounded-xl border-2 transition-all ${
-                active === i + 1
-                  ? "border-brand-orange shadow-orange"
-                  : "border-transparent opacity-70 hover:opacity-100"
-              }`}
-            >
-              <img
-                src={img.src}
-                alt=""
-                className="absolute inset-0 w-full h-full object-cover"
-              />
+                active === i + 1 ? "border-brand-orange shadow-orange" : "border-transparent opacity-70 hover:opacity-100"
+              }`}>
+              <img src={img.src} alt="" className="absolute inset-0 w-full h-full object-cover" />
             </button>
           ))}
         </div>
-
         <div className="flex items-center gap-2 rounded-full border border-green-100 bg-green-50 px-3 py-1.5 shadow-sm ml-auto">
           <span className="relative flex h-2 w-2">
             <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-400 opacity-75" />
@@ -249,17 +231,13 @@ function HeroImagePanel() {
         </div>
       </div>
 
-      {/* Dot indicators */}
       <div className="flex justify-center gap-1.5">
         {heroImages.map((_, i) => (
-          <button
-            key={i}
-            onClick={() => goTo(i)}
+          <button key={i} onClick={() => goTo(i)}
             className={`h-1.5 rounded-full transition-all ${
               active === i ? "w-5 bg-brand-orange" : "w-1.5 bg-stone-300"
             }`}
-            aria-label={`Go to slide ${i + 1}`}
-          />
+            aria-label={`Go to slide ${i + 1}`} />
         ))}
       </div>
     </div>
@@ -279,35 +257,53 @@ export function ProductsCatalog() {
   );
   const [showFilters, setShowFilters] = useState(false);
 
+  // ── Supabase live data ──────────────────────────────────────
+  const [dbProducts, setDbProducts] = useState<ProductRow[]>([]);
+  const [loading, setLoading]       = useState(true);
+
+  useEffect(() => {
+    async function fetchProducts() {
+      setLoading(true);
+   const supabase = createSupabaseBrowserClient();
+const { data, error } = await supabase
+  .from("products")
+        .select("*")
+        .order("created_at", { ascending: false });
+
+      if (!error && data) setDbProducts(data as ProductRow[]);
+      setLoading(false);
+    }
+    fetchProducts();
+  }, []);
+  // ────────────────────────────────────────────────────────────
+
   useEffect(() => {
     setSelectedCategory(categoryParam as Category | "All");
   }, [categoryParam]);
 
   const filtered = useMemo(
     () =>
-      products.filter((product) => {
+      dbProducts.filter((product) => {
         const matchesCategory =
           selectedCategory === "All" || product.category === selectedCategory;
         const term = search.toLowerCase();
         const matchesSearch =
           !term ||
           product.name.toLowerCase().includes(term) ||
-          product.description.toLowerCase().includes(term) ||
-          product.category.toLowerCase().includes(term);
+          (product.description ?? "").toLowerCase().includes(term) ||
+          (product.category ?? "").toLowerCase().includes(term);
         return matchesCategory && matchesSearch;
       }),
-    [selectedCategory, search]
+    [dbProducts, selectedCategory, search]
   );
 
   return (
     <div className="relative space-y-0 pb-36">
 
-      {/* ── Walking character ── */}
       <ShoppingCharacter />
 
-      {/* ── Hero banner: split layout ── */}
+      {/* ── Hero banner ── */}
       <div className="relative overflow-hidden rounded-2xl sm:rounded-3xl bg-gradient-to-br from-amber-50 via-orange-50 to-green-50 border border-orange-100 mb-10">
-
         <div className="pointer-events-none absolute -right-16 -top-16 h-72 w-72 rounded-full bg-brand-orange/8 blur-3xl" />
         <div className="pointer-events-none absolute -left-12 bottom-0 h-56 w-56 rounded-full bg-green-200/30 blur-2xl" />
         <div className="pointer-events-none absolute right-1/3 bottom-0 h-36 w-36 rounded-full bg-amber-200/40 blur-2xl" />
@@ -318,16 +314,12 @@ export function ProductsCatalog() {
           <FloatingSparkle delay={2.1} x="42%" size={9}  />
         </div>
 
-        <svg
-          className="pointer-events-none absolute left-3 top-3 opacity-20"
-          width="36" height="36" viewBox="0 0 36 36" fill="none"
-        >
+        <svg className="pointer-events-none absolute left-3 top-3 opacity-20"
+          width="36" height="36" viewBox="0 0 36 36" fill="none">
           <path d="M2 18 L2 2 L18 2" stroke="#f97316" strokeWidth="2" strokeLinecap="round" fill="none"/>
         </svg>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-0">
-
-          {/* LEFT: text */}
           <div className="relative z-10 flex flex-col justify-center px-6 sm:px-10 py-10 sm:py-14">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -373,10 +365,8 @@ export function ProductsCatalog() {
                   { icon: "🌿", label: "100% Organic" },
                   { icon: "🔒", label: "Secure Checkout" },
                 ].map((f) => (
-                  <div
-                    key={f.label}
-                    className="flex items-center gap-1.5 rounded-full bg-white/80 border border-orange-100 px-3 py-1.5 text-xs font-semibold text-stone-700 shadow-sm hover:border-brand-orange/40 hover:shadow-md transition-all"
-                  >
+                  <div key={f.label}
+                    className="flex items-center gap-1.5 rounded-full bg-white/80 border border-orange-100 px-3 py-1.5 text-xs font-semibold text-stone-700 shadow-sm hover:border-brand-orange/40 hover:shadow-md transition-all">
                     <span>{f.icon}</span>
                     {f.label}
                   </div>
@@ -385,7 +375,6 @@ export function ProductsCatalog() {
             </motion.div>
           </div>
 
-          {/* RIGHT: carousel */}
           <motion.div
             initial={{ opacity: 0, x: 30 }}
             animate={{ opacity: 1, x: 0 }}
@@ -404,11 +393,8 @@ export function ProductsCatalog() {
         transition={{ duration: 0.5, delay: 0.25 }}
         className="mb-6 flex flex-wrap items-center justify-between gap-3"
       >
-        <button
-          type="button"
-          onClick={() => setShowFilters(v => !v)}
-          className="flex items-center gap-2 rounded-full border border-orange-200 bg-white px-4 py-2 text-sm font-semibold text-stone-600 shadow-sm transition hover:border-brand-orange hover:text-brand-orange sm:hidden"
-        >
+        <button type="button" onClick={() => setShowFilters(v => !v)}
+          className="flex items-center gap-2 rounded-full border border-orange-200 bg-white px-4 py-2 text-sm font-semibold text-stone-600 shadow-sm transition hover:border-brand-orange hover:text-brand-orange sm:hidden">
           {showFilters ? <X className="h-3.5 w-3.5" /> : <SlidersHorizontal className="h-3.5 w-3.5" />}
           {showFilters ? "Hide" : "Filters"}
         </button>
@@ -421,13 +407,11 @@ export function ProductsCatalog() {
 
       <AnimatePresence>
         {showFilters && (
-          <motion.div
-            key="mobile-filters"
+          <motion.div key="mobile-filters"
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
-            className="mb-6 overflow-hidden sm:hidden"
-          >
+            className="mb-6 overflow-hidden sm:hidden">
             <CategoryFilters
               selected={selectedCategory}
               onSelect={(cat) => { setSelectedCategory(cat); setShowFilters(false); }}
@@ -436,18 +420,29 @@ export function ProductsCatalog() {
         )}
       </AnimatePresence>
 
+      {/* ── Loading skeleton ── */}
+      {loading && (
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 animate-pulse">
+          {[1, 2, 3, 4, 5, 6].map((i) => (
+            <div key={i} className="h-80 rounded-2xl bg-gray-100" />
+          ))}
+        </div>
+      )}
+
       {/* ── Product grid ── */}
-      <motion.div
-        key={`${selectedCategory}-${search}`}
-        initial={{ opacity: 0, y: 16 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
-      >
-        <ProductGrid products={filtered} />
-      </motion.div>
+      {!loading && (
+        <motion.div
+          key={`${selectedCategory}-${search}`}
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
+        >
+          <ProductGrid products={filtered} />
+        </motion.div>
+      )}
 
       {/* ── Empty state ── */}
-      {filtered.length === 0 && (
+      {!loading && filtered.length === 0 && (
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}

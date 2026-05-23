@@ -3,14 +3,14 @@
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
-import type { Product } from "@/src/data/products";
+import type { ProductRow } from "@/types";             // ← was Product from static file
 import { useCart } from "@/hooks/useCart";
 import { formatCurrency } from "@/lib/utils";
 import { Button } from "@/components/ui/Button";
 import { Badge } from "@/components/ui/Badge";
 import { ProductInquiryForm } from "./ProductInquiryForm";
 
-export function ProductDetail({ product }: { product: Product }) {
+export function ProductDetail({ product }: { product: ProductRow }) {  // ← was Product
   const router = useRouter();
   const { addToCart } = useCart();
 
@@ -34,7 +34,7 @@ export function ProductDetail({ product }: { product: Product }) {
             <Badge className="absolute left-4 top-4 z-10 shadow-sm">{product.badge}</Badge>
           ) : null}
           <Image
-            src={product.image}
+            src={product.image_url ?? "/placeholder.jpg"}  /* ← was product.image */
             alt={product.name}
             fill
             className="object-cover"

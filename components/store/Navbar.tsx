@@ -6,10 +6,12 @@ import {
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { Search, ShoppingCart, Menu, X } from "lucide-react";
+import { Search, ShoppingCart, Menu, X, User, LogIn } from "lucide-react";
 import { useCart } from "@/hooks/useCart";
 import { CartDrawer } from "./CartDrawer";
 import { cn } from "@/lib/utils";
+import { createBrowserClient } from "@supabase/ssr";
+import type { User as SupabaseUser } from "@supabase/supabase-js";
 
 function navLinkClass(active: boolean) {
   return cn(
@@ -29,8 +31,24 @@ function NavbarClient() {
   const [showCart,    setShowCart]    = useState(false);
   const [mounted,     setMounted]     = useState(false);
   const [mobileOpen,  setMobileOpen]  = useState(false);
+  const [user,        setUser]        = useState<SupabaseUser | null>(null);
 
-  useEffect(() => { setMounted(true); }, []);
+  const supabase = createBrowserClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  );
+
+  useEffect(() => {
+    setMounted(true);
+    // Get initial session
+    supabase.auth.getUser().then(({ data }) => setUser(data.user));
+    // Listen for auth changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null);
+    });
+    return () => subscription.unsubscribe();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Close mobile menu on route change
   useEffect(() => { setMobileOpen(false); }, [pathname]);
@@ -83,6 +101,44 @@ function NavbarClient() {
     { href: "/contact", label: "Contact", active: pathname === "/contact" },
   ];
 
+  // Auth button — shown in desktop header
+  const authButtonDesktop = mounted ? (
+    user ? (
+      <div className="hidden items-center gap-2 sm:flex">
+        <span className="flex items-center gap-1.5 rounded-full bg-orange-50 px-3 py-1.5 text-xs font-medium text-brand-orange">
+          <User className="h-3.5 w-3.5" />
+          {user.email?.split("@")[0]}
+        </span>
+      </div>
+    ) : (
+      <Link
+        href={`/login?redirect=${encodeURIComponent(pathname)}`}
+        className="hidden items-center gap-1.5 rounded-full px-3 py-2 text-sm font-semibold text-stone-500 transition hover:bg-orange-50 hover:text-brand-orange sm:flex"
+      >
+        <LogIn className="h-4 w-4" />
+        Sign in
+      </Link>
+    )
+  ) : null;
+
+  // Auth row — shown in mobile menu
+  const authRowMobile = mounted ? (
+    user ? (
+      <div className="flex items-center rounded-xl bg-orange-50/60 px-4 py-3 text-sm font-medium text-brand-orange">
+        <User className="mr-2 h-4 w-4" />
+        {user.email}
+      </div>
+    ) : (
+      <Link
+        href={`/login?redirect=${encodeURIComponent(pathname)}`}
+        className="flex items-center rounded-xl px-4 py-3 text-sm font-semibold text-stone-500 transition hover:bg-orange-50 hover:text-brand-orange"
+      >
+        <LogIn className="mr-2 h-4 w-4" />
+        Sign in
+      </Link>
+    )
+  ) : null;
+
   return (
     <>
       <header className="sticky top-0 z-30 border-b border-orange-100/60 bg-white/95 shadow-sm backdrop-blur-md">
@@ -122,13 +178,8 @@ function NavbarClient() {
                 </form>
               )}
 
-              {/* Sign in — hidden on small mobile, shown from sm */}
-              <Link
-                href={`/login?redirect=${encodeURIComponent(pathname)}`}
-                className="hidden rounded-full px-3 py-2 text-sm font-semibold text-stone-500 transition hover:bg-orange-50 hover:text-brand-orange sm:block"
-              >
-                Sign in
-              </Link>
+              {/* Auth button desktop */}
+              {authButtonDesktop}
 
               {/* Cart button */}
               <button
@@ -170,7 +221,7 @@ function NavbarClient() {
         <div
           className={cn(
             "overflow-hidden border-t border-orange-100/60 bg-white/98 backdrop-blur-md transition-all duration-300 ease-in-out md:hidden",
-            mobileOpen ? "max-h-[420px] opacity-100" : "max-h-0 opacity-0"
+            mobileOpen ? "max-h-[480px] opacity-100" : "max-h-0 opacity-0"
           )}
         >
           <div className="mx-auto max-w-6xl space-y-1 px-4 pb-5 pt-3">
@@ -200,13 +251,8 @@ function NavbarClient() {
               </Link>
             ))}
 
-            {/* Sign in */}
-            <Link
-              href={`/login?redirect=${encodeURIComponent(pathname)}`}
-              className="flex items-center rounded-xl px-4 py-3 text-sm font-semibold text-stone-500 transition hover:bg-orange-50 hover:text-brand-orange"
-            >
-              Sign in
-            </Link>
+            {/* Auth row mobile */}
+            {authRowMobile}
           </div>
         </div>
       </header>

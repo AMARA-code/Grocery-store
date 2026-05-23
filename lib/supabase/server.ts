@@ -17,13 +17,18 @@ function assertSupabaseServerEnv(): { url: string; anonKey: string } {
 
 /**
  * Server Supabase client (Server Components, Route Handlers).
- * Cookie writes are no-ops when called from a static Server Component context.
+ * Uses await cookies() for Next.js 15 compatibility.
  */
-export function createSupabaseServerClient() {
+export async function createSupabaseServerClient() {
   const { url, anonKey } = assertSupabaseServerEnv();
-  const cookieStore = cookies();
+  const cookieStore = await cookies(); // ← await required in Next.js 15
 
   return createServerClient(url, anonKey, {
+    // Never cache Supabase fetch calls
+    global: {
+      fetch: (input, init) =>
+        fetch(input, { ...init, cache: "no-store" }),
+    },
     cookies: {
       getAll() {
         return cookieStore.getAll();

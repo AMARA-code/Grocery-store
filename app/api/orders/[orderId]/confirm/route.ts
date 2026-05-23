@@ -11,7 +11,7 @@ export async function POST(
   const { orderId } = params;
 
   // 1. Verify the caller is an admin
-  const supabase = createSupabaseServerClient();
+  const supabase = await createSupabaseServerClient(); // ← await
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -80,7 +80,6 @@ export async function POST(
     });
   } catch (emailErr) {
     console.error("Failed to send confirmation email:", emailErr);
-    // Order is already confirmed — don't fail the request over email
   }
 
   return NextResponse.json({ success: true, orderId });

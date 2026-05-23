@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import type { Product } from "../data/products";
+import type { Product } from "../../types";  // ← updated import to use shared type
 import { Badge } from "@/components/ui/Badge";
 
 type ProductCardProps = {
@@ -22,7 +22,10 @@ export default function ProductCard({ product }: ProductCardProps) {
           {product.badge && (
             <Badge className="absolute left-3 top-3 z-10 shadow-sm">{product.badge}</Badge>
           )}
-          <Image src={product.image} alt={product.name} fill
+          <Image
+            src={product.image_url}  /* ← was product.image */
+            alt={product.name}
+            fill
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
             className="object-cover transition-transform duration-500 group-hover:scale-[1.05]"
           />

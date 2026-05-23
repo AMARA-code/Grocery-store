@@ -1,9 +1,9 @@
-import type { Product } from "@/src/data/products";
+import type { ProductRow } from "@/types";        // ← was Product from static file
 import { ProductCard } from "./ProductCard";
 import { cn } from "@/lib/utils";
 
 export type ProductGridProps = {
-  products: Product[];
+  products: ProductRow[];                          // ← was Product[]
   className?: string;
 };
 

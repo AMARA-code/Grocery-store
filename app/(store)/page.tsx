@@ -12,10 +12,10 @@ import { Button } from "@/components/ui/Button";
    DATA
 ══════════════════════════════════════════ */
 const SLIDES = [
-  { src: "/hero.jpg",  label: "Farm-fresh, delivered daily" },
-  { src: "/hero1.jpg", label: "Handpicked from local farms" },
+  { src: "/hero.jpg",  label: "Fresh groceries, delivered daily" },
+  { src: "/hero1.jpg", label: "Thousands of products, one place" },
   { src: "/hero2.jpg", label: "Quality you can taste" },
-  { src: "/hero3.jpg", label: "Straight from nature to you" },
+  { src: "/hero3.jpg", label: "Everything your kitchen needs" },
   { src: "/hero4.jpg", label: "Freshness, redefined" },
 ];
 
@@ -35,9 +35,9 @@ const CATEGORIES = [
 ];
 
 const WHY_US = [
-  { icon: "🌿", title: "100% Organic",   desc: "Every product is certified organic, sourced directly from trusted local farms with zero pesticides." },
+  { icon: "🌿", title: "100% Fresh",     desc: "Every product is carefully selected and quality-checked before it reaches your door. Freshness is our promise." },
   { icon: "⚡", title: "Lightning Fast", desc: "Same-day delivery in selected areas. Order by noon, get it by evening — guaranteed." },
-  { icon: "🤝", title: "Local Farmers",  desc: "We partner with 50+ local farm families, supporting sustainable agriculture and fair wages." },
+  { icon: "🏷️", title: "Best Prices",   desc: "We offer competitive prices across all categories with weekly deals and member-exclusive discounts." },
   { icon: "♻️", title: "Zero Waste",     desc: "Eco-friendly packaging, minimal plastic, and a commitment to a greener planet." },
   { icon: "🔒", title: "Safe Payments",  desc: "Bank-grade security on every transaction. Your data is always protected." },
   { icon: "💬", title: "24/7 Support",   desc: "Our team is always here. Chat, call, or email — we respond in minutes, not hours." },
@@ -45,7 +45,7 @@ const WHY_US = [
 
 const TESTIMONIALS = [
   { name: "Ayesha Khan",   role: "Home Chef",         avatar: "AK", text: "FreshCart has completely changed how I shop. The produce is incredibly fresh and delivery is always on time. I've cancelled my supermarket membership!" },
-  { name: "Omar Siddiqui", role: "Fitness Trainer",   avatar: "OS", text: "As someone who's very particular about food quality, FreshCart is the only grocery service I trust. The organic vegetables are outstanding." },
+  { name: "Omar Siddiqui", role: "Fitness Trainer",   avatar: "OS", text: "As someone who's very particular about food quality, FreshCart is the only grocery service I trust. The selection is outstanding and prices are great." },
   { name: "Sara Malik",    role: "Busy Mom of Three", avatar: "SM", text: "Saves me hours every week. The app is beautiful, the food is fresh, and my kids actually eat more vegetables now. Highly recommend!" },
 ];
 
@@ -140,7 +140,6 @@ export default function HomePage() {
   }, [next, paused]);
 
   return (
-    /* overflow-x-hidden kills the horizontal scrollbar site-wide */
     <div className="space-y-16 sm:space-y-20 md:space-y-28 overflow-x-hidden w-full min-w-0">
 
       {/* ════════════════════════════
@@ -175,7 +174,7 @@ export default function HomePage() {
         <Corner className="absolute bottom-14 right-4 z-20 text-brand-orange/50 rotate-180" />
 
         <div className="absolute right-6 top-1/2 z-20 hidden lg:flex" style={{ writingMode: "vertical-rl", transform: "translateY(-50%) rotate(180deg)" }}>
-          <span className="text-[10px] font-semibold tracking-[0.22em] uppercase text-stone-400">Premium Collection</span>
+          <span className="text-[10px] font-semibold tracking-[0.22em] uppercase text-stone-400">Premium Selection</span>
         </div>
 
         <motion.div
@@ -185,7 +184,7 @@ export default function HomePage() {
           <motion.div variants={stagger} initial="hidden" animate="show" className="space-y-4 sm:space-y-6">
             <motion.div variants={fadeUp} className="flex items-center gap-3">
               <div className="h-px w-8 bg-brand-orange" />
-              <span className="text-[10px] sm:text-[11px] font-bold tracking-[0.18em] uppercase text-brand-orange">Fresh · Fast · Local</span>
+              <span className="text-[10px] sm:text-[11px] font-bold tracking-[0.18em] uppercase text-brand-orange">Fresh · Fast · Affordable</span>
             </motion.div>
 
             <motion.h1
@@ -235,9 +234,9 @@ export default function HomePage() {
         >
           <div className="bg-white/90 backdrop-blur-md rounded-2xl shadow-xl border border-white/70 overflow-hidden w-52 xl:w-56">
             {[
-              { icon: "🛒", value: "2,400+", label: "PRODUCTS" },
-              { icon: "⭐", value: "4.9 / 5 ★", label: "RATING" },
-              { icon: "🌿", value: "50+", label: "FARM PARTNERS" },
+              { icon: "🛒", value: "Happy Customers", label: "THOUSANDS SERVED" },
+              { icon: "⭐", value: "4.9 / 5 ★",       label: "RATING" },
+              { icon: "🚀", value: "3hr Delivery",     label: "AVG. DELIVERY TIME" },
             ].map((s, i) => (
               <div key={s.label} className={`flex items-center gap-3 px-4 py-3.5 ${i < 2 ? "border-b border-stone-100" : ""}`}>
                 <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-base bg-orange-50">{s.icon}</span>
@@ -293,10 +292,10 @@ export default function HomePage() {
         className="grid grid-cols-2 md:grid-cols-4 gap-0 rounded-2xl sm:rounded-3xl overflow-hidden shadow-xl border border-orange-100"
       >
         {[
-          { value: 2400, suffix: "+", label: "Products in Stock",  icon: "🛒", bg: "bg-brand-cream" },
-          { value: 49,   suffix: "★", label: "Customer Rating",    icon: "⭐", bg: "bg-white" },
-          { value: 50,   suffix: "+", label: "Farm Partners",      icon: "🌿", bg: "bg-brand-cream" },
-          { value: 3,    suffix: "h", label: "Avg. Delivery Time", icon: "⚡", bg: "bg-white" },
+          { value: 10,  suffix: "k+", label: "Happy Customers",    icon: "😊", bg: "bg-brand-cream" },
+          { value: 49,  suffix: "★",  label: "Customer Rating",    icon: "⭐", bg: "bg-white" },
+          { value: 50,  suffix: "+",  label: "Trusted Brands",     icon: "🏷️", bg: "bg-brand-cream" },
+          { value: 3,   suffix: "h",  label: "Avg. Delivery Time", icon: "⚡", bg: "bg-white" },
         ].map((s) => (
           <motion.div
             key={s.label}
@@ -339,28 +338,20 @@ export default function HomePage() {
             >
               <Link
                 href={`/products?category=${encodeURIComponent(cat.label)}`}
-                /* aspect-ratio keeps cards consistent; image fills 100%, gradient overlays for text */
                 className="relative flex flex-col items-center justify-end overflow-hidden rounded-2xl w-full group block"
                 style={{ aspectRatio: "3/4" }}
               >
-                {/* Full background image */}
                 <Image
                   src={cat.image}
                   alt={cat.label}
                   fill
                   className="object-cover transition-transform duration-500 group-hover:scale-110"
                 />
-
-                {/* Always-on dark gradient so text is readable */}
                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-black/5 z-10" />
-
-                {/* Accent colour tint on hover */}
                 <div
                   className="absolute inset-0 z-10 opacity-0 group-hover:opacity-25 transition-opacity duration-300"
                   style={{ backgroundColor: cat.accent }}
                 />
-
-                {/* Text pinned to bottom */}
                 <div className="relative z-20 w-full px-2 sm:px-3 pb-3 sm:pb-4 pt-2 text-center">
                   <p className="text-white font-bold text-xs sm:text-sm leading-tight drop-shadow-lg">
                     {cat.label}
@@ -409,16 +400,16 @@ export default function HomePage() {
           className="space-y-6"
         >
           <SectionLabel>Our Promise</SectionLabel>
-          <SectionHeading>Farm to Table,<br /><em className="not-italic text-brand-orange">The Right Way.</em></SectionHeading>
+          <SectionHeading>Your Complete<br /><em className="not-italic text-brand-orange">Grocery Store.</em></SectionHeading>
           <p className="text-stone-500 leading-relaxed max-w-md text-sm sm:text-base">
-            We work directly with over 50 local farm families to bring you the freshest produce possible. No middlemen, no cold-chain delays — just real food, picked at peak freshness and delivered straight to your door.
+            FreshCart brings the full supermarket experience to your fingertips. From daily essentials to specialty items, we stock everything your household needs — handpicked for quality and delivered with care.
           </p>
           <div className="grid grid-cols-2 gap-3">
             {[
-              { icon: "🌾", label: "Direct from farms" },
+              { icon: "🛒", label: "One-stop shopping" },
               { icon: "🚚", label: "Same-day delivery" },
               { icon: "🌡️", label: "Cold-chain certified" },
-              { icon: "🏷️", label: "Fair farmer pricing" },
+              { icon: "🏷️", label: "Best price guarantee" },
             ].map(f => (
               <div key={f.label} className="flex items-center gap-2 sm:gap-3 p-2.5 sm:p-3 rounded-xl bg-brand-cream border border-orange-100">
                 <span className="text-lg sm:text-xl">{f.icon}</span>
@@ -426,7 +417,7 @@ export default function HomePage() {
               </div>
             ))}
           </div>
-          <Button href="/products" variant="primary">Shop Fresh Now</Button>
+          <Button href="/products" variant="primary">Shop Now</Button>
         </motion.div>
 
         <motion.div
@@ -437,7 +428,7 @@ export default function HomePage() {
           className="relative mt-10 lg:mt-0"
         >
           <div className="relative h-64 sm:h-80 lg:h-[480px] rounded-2xl sm:rounded-3xl overflow-hidden shadow-2xl">
-            <Image src="/hero2.jpg" alt="Fresh farm produce" fill className="object-cover" />
+            <Image src="/hero2.jpg" alt="Fresh grocery selection" fill className="object-cover" />
             <div className="absolute inset-0 bg-gradient-to-t from-black/25 to-transparent" />
           </div>
           <motion.div
@@ -447,8 +438,8 @@ export default function HomePage() {
           >
             <span className="text-xl sm:text-2xl">🌿</span>
             <div>
-              <p className="font-bold text-brand-charcoal text-xs sm:text-sm">100% Organic</p>
-              <p className="text-[10px] sm:text-xs text-stone-400">Certified & verified</p>
+              <p className="font-bold text-brand-charcoal text-xs sm:text-sm">Always Fresh</p>
+              <p className="text-[10px] sm:text-xs text-stone-400">Quality guaranteed</p>
             </div>
           </motion.div>
           <motion.div
