@@ -332,7 +332,7 @@ export default function ContactPage() {
             <div className="space-y-2.5">
               <FaqItem
                 q="Where is my order?"
-                a="Once your order ships, you'll get an email with tracking info. You can also check order status from your account dashboard."
+                a="Once your order ships, you'll get an email with tracking info."
               />
               <FaqItem
                 q="Can I change or cancel my order?"
@@ -340,10 +340,10 @@ export default function ContactPage() {
               />
               <FaqItem
                 q="Do you offer same-day delivery?"
-                a="We're working on it! For now, orders are typically delivered within 1–3 business days depending on your area."
+                a="Yes, orders are typically delivered within 3 - 5 hours depending on your area."
               />
               <FaqItem
-                q="Are all products fresh and organic?"
+                q="Are all products fresh and original?"
                 a="We partner directly with trusted local suppliers to ensure you get the freshest, highest-quality groceries."
               />
             </div>

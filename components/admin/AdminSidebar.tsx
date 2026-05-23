@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { LayoutDashboard, Package, ShoppingBag, LogOut, X } from "lucide-react";
+import { LayoutDashboard, Package, ShoppingBag, MessageSquare, LogOut, X } from "lucide-react";
 import toast from "react-hot-toast";
 import { useAuth } from "@/hooks/useAuth";
 import { cn } from "@/lib/utils";
@@ -11,6 +11,7 @@ const links = [
   { href: "/admin", label: "Dashboard", icon: LayoutDashboard, exact: true },
   { href: "/admin/products", label: "Products", icon: Package, exact: false },
   { href: "/admin/orders", label: "Orders", icon: ShoppingBag, exact: false },
+   { href: "/admin/queries",  label: "Queries",   icon: MessageSquare,    exact: false },
 ] as const;
 
 interface AdminSidebarProps {

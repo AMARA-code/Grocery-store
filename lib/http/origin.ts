@@ -9,5 +9,5 @@ export function getRequestOrigin(request: Request): string {
     request.headers.get("x-forwarded-host") ?? request.headers.get("host");
   const proto = request.headers.get("x-forwarded-proto") ?? "http";
   if (host) return `${proto}://${host}`;
-  return "http://localhost:3000";
+  return "https://grocery-store-amara-web-solutions.vercel.app";
 }

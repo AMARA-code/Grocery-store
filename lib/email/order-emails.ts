@@ -3,10 +3,13 @@
 // ─────────────────────────────────────────────────────────────────────────────
 
 export interface OrderEmailData {
-  customerName: string;
-  orderId:       string;
-  total:         number;
-  items:         { name: string; quantity: number; price: number }[];
+  customerName:    string;
+  orderId:         string;
+  total:           number;
+  originalTotal?:  number;
+  discount?:       number;
+  promoCode?:      string;
+  items:           { name: string; quantity: number; price: number }[];
   shippingAddress: string;
   paymentMethod:   string;
   transactionId?:  string | null;
@@ -33,6 +36,28 @@ function itemRows(items: OrderEmailData["items"]) {
         ${pkrFormat(item.price * item.quantity)}
       </td>
     </tr>`).join("");
+}
+
+function discountRows(discount: number, originalTotal: number, promoCode?: string) {
+  if (!discount) return "";
+  return `
+    <tr>
+      <td colspan="2" style="padding:8px 14px;font-size:13px;color:#9ca3af;">
+        Original subtotal
+      </td>
+      <td style="padding:8px 14px;font-size:13px;color:#9ca3af;text-align:right;text-decoration:line-through;">
+        ${pkrFormat(originalTotal)}
+      </td>
+    </tr>
+    <tr style="background:#f0fdf4;">
+      <td colspan="2" style="padding:8px 14px;font-size:13px;color:#16a34a;font-weight:600;">
+        🎉 Promo ${promoCode ? `(${promoCode})` : "discount"} — 10% off
+      </td>
+      <td style="padding:8px 14px;font-size:13px;color:#16a34a;text-align:right;font-weight:600;">
+        − ${pkrFormat(discount)}
+      </td>
+    </tr>
+  `;
 }
 
 function emailShell(headerColor: string, headerEmoji: string, headerLabel: string, body: string) {
@@ -84,9 +109,11 @@ function emailShell(headerColor: string, headerEmoji: string, headerLabel: strin
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// 1. COD Order Confirmed — includes full bill (customer pays on delivery)
+// 1. COD Order Confirmed
 // ─────────────────────────────────────────────────────────────────────────────
 export function codConfirmationTemplate(data: OrderEmailData): string {
+  const hasDiscount = !!data.discount && !!data.originalTotal;
+
   const body = `
     <h2 style="margin:0 0 8px;color:#111827;font-size:20px;font-weight:700;">
       Your order is confirmed, ${data.customerName}! 🎉
@@ -96,6 +123,14 @@ export function codConfirmationTemplate(data: OrderEmailData): string {
       and is being prepared right now. Since you chose <strong>Cash on Delivery</strong>, please
       have <strong>${pkrFormat(data.total)}</strong> ready when your order arrives — same day delivery!
     </p>
+
+    ${hasDiscount ? `
+    <!-- Promo banner -->
+    <div style="background:linear-gradient(135deg,#f0fdf4,#dcfce7);border:1px solid #86efac;border-radius:12px;padding:14px 18px;margin-bottom:20px;text-align:center;">
+      <p style="margin:0;font-size:13px;color:#15803d;font-weight:700;">
+        🎉 You saved ${pkrFormat(data.discount!)} with code ${data.promoCode ?? "FRESH10"}!
+      </p>
+    </div>` : ""}
 
     <!-- Order ID -->
     <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px;padding:14px 18px;margin-bottom:28px;">
@@ -118,6 +153,7 @@ export function codConfirmationTemplate(data: OrderEmailData): string {
       </thead>
       <tbody>${itemRows(data.items)}</tbody>
       <tfoot>
+        ${hasDiscount ? discountRows(data.discount!, data.originalTotal!, data.promoCode) : ""}
         <tr style="background:#f0fdf4;">
           <td colspan="2" style="padding:12px 14px;font-size:14px;font-weight:700;color:#111827;">
             💵 Amount to Pay on Delivery
@@ -131,13 +167,13 @@ export function codConfirmationTemplate(data: OrderEmailData): string {
 
     <!-- Delivery info -->
     <div style="background:#f9fafb;border-radius:10px;padding:16px;margin-bottom:24px;">
-      <div style="font-size:11px;color:#9ca3af;text-transform:uppercase;font-weight:600;letter-spacing:0.5px;margin-bottom:6px;">📍 Delivery Address</div>
+      <div style="font-size:11px;color:#9ca3af;text-transform:uppercase;font-weight:600;letter-spacing:0.5px;margin-bottom:6px;">📌 Delivery Address</div>
       <div style="font-size:13px;color:#374151;line-height:1.5;">${data.shippingAddress}</div>
     </div>
 
     <!-- What's next -->
     <div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:10px;padding:16px 20px;margin-bottom:24px;">
-      <div style="font-size:13px;font-weight:700;color:#1d4ed8;margin-bottom:8px;">📦 What happens next?</div>
+      <div style="font-size:13px;font-weight:700;color:#1d4ed8;margin-bottom:8px;">📋 What happens next?</div>
       <ul style="margin:0;padding-left:18px;color:#1e40af;font-size:13px;line-height:1.9;">
         <li>Our team is packing your fresh items now</li>
         <li>You'll receive a shipment email once your order is on the way</li>
@@ -148,7 +184,7 @@ export function codConfirmationTemplate(data: OrderEmailData): string {
 
     <p style="margin:0;color:#9ca3af;font-size:12px;text-align:center;line-height:1.6;">
       Questions? Reply to this email and we'll sort it out.<br/>
-      Thank you for choosing <strong style="color:#16a34a;">FreshCart</strong> 🥦
+      Thank you for choosing <strong style="color:#16a34a;">FreshCart</strong> 🌿
     </p>
   `;
 
@@ -161,9 +197,11 @@ export function codConfirmationTemplate(data: OrderEmailData): string {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// 2. Advance Payment Confirmed — includes receipt (payment already made)
+// 2. Advance Payment Confirmed
 // ─────────────────────────────────────────────────────────────────────────────
 export function advanceConfirmationTemplate(data: OrderEmailData): string {
+  const hasDiscount = !!data.discount && !!data.originalTotal;
+
   const body = `
     <h2 style="margin:0 0 8px;color:#111827;font-size:20px;font-weight:700;">
       Payment confirmed, ${data.customerName}! 🎉
@@ -173,6 +211,14 @@ export function advanceConfirmationTemplate(data: OrderEmailData): string {
       <strong style="color:#7c3aed;">confirmed</strong>. Your groceries are being packed for
       <strong>same-day delivery</strong>. No payment needed at the door — you're all set!
     </p>
+
+    ${hasDiscount ? `
+    <!-- Promo banner -->
+    <div style="background:linear-gradient(135deg,#faf5ff,#ede9fe);border:1px solid #c4b5fd;border-radius:12px;padding:14px 18px;margin-bottom:20px;text-align:center;">
+      <p style="margin:0;font-size:13px;color:#6d28d9;font-weight:700;">
+        🎉 You saved ${pkrFormat(data.discount!)} with code ${data.promoCode ?? "FRESH10"}!
+      </p>
+    </div>` : ""}
 
     <!-- Order ID + TXN -->
     <div style="background:#faf5ff;border:1px solid #e9d5ff;border-radius:10px;padding:14px 18px;margin-bottom:28px;">
@@ -200,6 +246,7 @@ export function advanceConfirmationTemplate(data: OrderEmailData): string {
       </thead>
       <tbody>${itemRows(data.items)}</tbody>
       <tfoot>
+        ${hasDiscount ? discountRows(data.discount!, data.originalTotal!, data.promoCode) : ""}
         <tr style="background:#faf5ff;">
           <td colspan="2" style="padding:12px 14px;font-size:14px;font-weight:700;color:#111827;">
             ✅ Amount Paid
@@ -213,15 +260,15 @@ export function advanceConfirmationTemplate(data: OrderEmailData): string {
 
     <!-- Delivery info -->
     <div style="background:#f9fafb;border-radius:10px;padding:16px;margin-bottom:24px;">
-      <div style="font-size:11px;color:#9ca3af;text-transform:uppercase;font-weight:600;letter-spacing:0.5px;margin-bottom:6px;">📍 Delivery Address</div>
+      <div style="font-size:11px;color:#9ca3af;text-transform:uppercase;font-weight:600;letter-spacing:0.5px;margin-bottom:6px;">📌 Delivery Address</div>
       <div style="font-size:13px;color:#374151;line-height:1.5;">${data.shippingAddress}</div>
     </div>
 
     <!-- What's next -->
     <div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:10px;padding:16px 20px;margin-bottom:24px;">
-      <div style="font-size:13px;font-weight:700;color:#1d4ed8;margin-bottom:8px;">📦 What happens next?</div>
+      <div style="font-size:13px;font-weight:700;color:#1d4ed8;margin-bottom:8px;">📋 What happens next?</div>
       <ul style="margin:0;padding-left:18px;color:#1e40af;font-size:13px;line-height:1.9;">
-        <li>Your payment has been verified ✓</li>
+        <li>Your payment has been verified ✔</li>
         <li>Our team is packing your fresh items now</li>
         <li>You'll receive a shipment email once your order is on the way</li>
         <li>Delivery is <strong>same day</strong> — no payment needed at the door</li>
@@ -230,7 +277,7 @@ export function advanceConfirmationTemplate(data: OrderEmailData): string {
 
     <p style="margin:0;color:#9ca3af;font-size:12px;text-align:center;line-height:1.6;">
       Keep this email as your receipt.<br/>
-      Thank you for choosing <strong style="color:#7c3aed;">FreshCart</strong> 🥦
+      Thank you for choosing <strong style="color:#7c3aed;">FreshCart</strong> 🌿
     </p>
   `;
 
@@ -243,7 +290,7 @@ export function advanceConfirmationTemplate(data: OrderEmailData): string {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// 3. Shipment Notification — sent when admin marks order as shipped
+// 3. Shipment Notification
 // ─────────────────────────────────────────────────────────────────────────────
 export function shipmentNotificationTemplate(data: OrderEmailData): string {
   const isCod = data.paymentMethod === "cod";
@@ -268,7 +315,7 @@ export function shipmentNotificationTemplate(data: OrderEmailData): string {
     </div>
 
     <!-- Items summary -->
-    <h3 style="margin:0 0 12px;color:#111827;font-size:15px;font-weight:700;">📦 What's in your delivery</h3>
+    <h3 style="margin:0 0 12px;color:#111827;font-size:15px;font-weight:700;">📋 What's in your delivery</h3>
     <table width="100%" cellpadding="0" cellspacing="0"
       style="border:1px solid #f0f0f0;border-radius:10px;overflow:hidden;margin-bottom:24px;">
       <thead>
@@ -291,19 +338,17 @@ export function shipmentNotificationTemplate(data: OrderEmailData): string {
 
     <!-- Delivery address -->
     <div style="background:#f9fafb;border-radius:10px;padding:16px;margin-bottom:24px;">
-      <div style="font-size:11px;color:#9ca3af;text-transform:uppercase;font-weight:600;letter-spacing:0.5px;margin-bottom:6px;">📍 Delivering To</div>
+      <div style="font-size:11px;color:#9ca3af;text-transform:uppercase;font-weight:600;letter-spacing:0.5px;margin-bottom:6px;">📌 Delivering To</div>
       <div style="font-size:13px;color:#374151;line-height:1.5;">${data.shippingAddress}</div>
     </div>
 
     ${isCod ? `
-    <!-- COD reminder -->
     <div style="background:#fef3c7;border:1px solid #fcd34d;border-radius:10px;padding:16px 20px;margin-bottom:24px;">
       <div style="font-size:13px;font-weight:700;color:#92400e;margin-bottom:4px;">💵 Cash on Delivery Reminder</div>
       <p style="margin:0;color:#78350f;font-size:13px;line-height:1.6;">
         Please have <strong>${pkrFormat(data.total)}</strong> ready in cash when the delivery person arrives.
       </p>
     </div>` : `
-    <!-- Advance paid note -->
     <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px;padding:16px 20px;margin-bottom:24px;">
       <div style="font-size:13px;font-weight:700;color:#15803d;margin-bottom:4px;">✅ Payment Already Received</div>
       <p style="margin:0;color:#166534;font-size:13px;line-height:1.6;">
@@ -314,7 +359,7 @@ export function shipmentNotificationTemplate(data: OrderEmailData): string {
 
     <p style="margin:0;color:#9ca3af;font-size:12px;text-align:center;line-height:1.6;">
       Questions? Reply to this email and we'll help right away.<br/>
-      Thank you for shopping with <strong style="color:#ea580c;">FreshCart</strong> 🥦
+      Thank you for shopping with <strong style="color:#ea580c;">FreshCart</strong> 🌿
     </p>
   `;
 

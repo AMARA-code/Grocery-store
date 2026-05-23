@@ -21,29 +21,32 @@ export type PlaceOrderInput = {
   paymentMethod: PaymentMethod;
   paymentProvider?: PaymentProvider;
   transactionId?: string;
+  promoCode?: string;
+  discount?: number;
 };
 
 export async function placeOrder(
   supabase: SupabaseClient,
   input: PlaceOrderInput
-): Promise<{ orderId: string; total: number }> {
-  const { userId, items, shipping, paymentMethod, paymentProvider, transactionId } = input;
+): Promise<{ orderId: string; total: number; discount: number; originalTotal: number }> {
+  const {
+    userId, items, shipping, paymentMethod,
+    paymentProvider, transactionId, promoCode, discount = 0,
+  } = input;
 
-  // 1. Calculate total
-  const total = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
+  const originalTotal = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
+  const total = Math.max(0, originalTotal - discount);
+  const itemsSummary = items.map((i) => `${i.name} x${i.quantity}`).join(", ");
 
-  // 2. Build a readable items summary for the orders table
-  const itemsSummary = items
-    .map((i) => `${i.name} x${i.quantity}`)
-    .join(", ");
-
-  // 3. Insert the order row
   const { data: order, error: orderError } = await supabase
     .from("orders")
     .insert({
       user_id:          userId,
       status:           "pending",
       total,
+      original_total:   originalTotal,
+      discount:         discount,
+      promo_code:       promoCode ?? null,
       payment_method:   paymentMethod,
       payment_provider: paymentProvider ?? null,
       transaction_id:   transactionId ?? null,
@@ -62,44 +65,28 @@ export async function placeOrder(
 
   const orderId = order.id as string;
 
-  // 4. Insert order_items rows
-// 4. Insert order_items rows
-const orderItems = items.map((item) => ({
-  order_id:     orderId,
-  product_id:   parseProductUuid(item.id) ?? null,  // null is now allowed
-  product_name: item.name,
-  quantity:     item.quantity,
-  price:        item.price,
-}));
+  const orderItems = items.map((item) => ({
+    order_id:     orderId,
+    product_id:   parseProductUuid(item.id) ?? null,
+    product_name: item.name,
+    quantity:     item.quantity,
+    price:        item.price,
+  }));
 
-  const { error: itemsError } = await supabase
-    .from("order_items")
-    .insert(orderItems);
+  const { error: itemsError } = await supabase.from("order_items").insert(orderItems);
+  if (itemsError) throw new Error(itemsError.message ?? "Failed to save order items");
 
-  if (itemsError) {
-    throw new Error(itemsError.message ?? "Failed to save order items");
-  }
-
-  // 5. Decrement stock for each product that has a valid UUID
-  //    We do this one by one so a missing product doesn't crash the whole order.
-  //    stock is clamped to 0 — it will never go negative.
   for (const item of items) {
     const productId = parseProductUuid(item.id);
-    if (!productId) continue; // skip if id is not a UUID
-
+    if (!productId) continue;
     const { error: stockError } = await supabase.rpc("decrement_stock", {
       p_product_id: productId,
       p_quantity:   item.quantity,
     });
-
-    // Log but don't crash the order if stock update fails
     if (stockError) {
-      console.error(
-        `Stock decrement failed for product ${productId}:`,
-        stockError.message
-      );
+      console.error(`Stock decrement failed for product ${productId}:`, stockError.message);
     }
   }
 
-  return { orderId, total };
+  return { orderId, total, discount, originalTotal };
 }

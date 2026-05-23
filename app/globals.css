@@ -84,3 +84,38 @@ body {
 ::-webkit-scrollbar-track { background: #ffffff; }
 ::-webkit-scrollbar-thumb { background: #FED7AA; border-radius: 3px; }
 ::-webkit-scrollbar-thumb:hover { background: var(--orange); }
+
+/* Add these to your existing globals.css (app/globals.css)
+   These are the missing custom utilities that Tailwind can't
+   generate automatically from the config alone.             */
+
+/* ── Shimmer text (used on "Reimagined." in hero heading) ── */
+.text-shimmer {
+  background: linear-gradient(
+    90deg,
+    #F97316 0%,
+    #FBBF24 35%,
+    #F97316 50%,
+    #C2410C 65%,
+    #F97316 100%
+  );
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: shimmer 3s linear infinite;
+}
+
+/* ── Ensure brand-cream bg works as a page background ──────
+   (prevents any dark-mode override turning the page dark)  */
+body {
+  background-color: #FFFBF5;
+}
+
+/* ── Prevent dark mode from inverting the hero gradients ── */
+@media (prefers-color-scheme: dark) {
+  body {
+    background-color: #FFFBF5;
+    color: #1C1917;
+  }
+}
