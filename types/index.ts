@@ -23,7 +23,7 @@ export interface Product {
   id: string;
   name: string;
   price: number;
-  category: string;
+  category: string | null;
   description: string;
   image_url: string;
   badge?: string | null;
