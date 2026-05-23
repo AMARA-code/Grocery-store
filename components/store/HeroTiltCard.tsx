@@ -3,10 +3,10 @@
 import { useRef, useState } from "react";
 import { motion, useSpring } from "framer-motion";
 import { ProductGrid } from "@/components/store/ProductGrid";
-import type { SeedProduct as Product } from "@/types/index";
+import type { ProductRow } from "@/types";
 
 interface Props {
-  products: Product[];
+  products: ProductRow[];
 }
 
 export default function HeroTiltCard({ products }: Props) {
@@ -36,7 +36,6 @@ export default function HeroTiltCard({ products }: Props) {
       animate={{ opacity: 1, y: 0, transition: { duration: 0.7, delay: 0.3, ease: [0.22, 1, 0.36, 1] } }}
       className="relative cursor-pointer rounded-3xl border border-white/60 bg-white/90 p-6 shadow-card-hover backdrop-blur-md transition-shadow duration-300 hover:shadow-green md:p-8"
     >
-      {/* Top accent bar */}
       <div className="absolute inset-x-0 top-0 h-1 rounded-t-3xl bg-gradient-to-r from-forest-500 via-gold-400 to-sage-400" />
 
       <div className="flex items-center justify-between">
@@ -57,7 +56,6 @@ export default function HeroTiltCard({ products }: Props) {
         <ProductGrid products={products} />
       </div>
 
-      {/* Subtle inner glow */}
       <div className="pointer-events-none absolute inset-0 rounded-3xl bg-gradient-to-br from-forest-500/[0.03] to-gold-300/[0.05]" />
     </motion.div>
   );
