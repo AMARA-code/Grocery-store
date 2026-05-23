@@ -3,12 +3,12 @@
 import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import type { ProductRow } from "@/types";          // ← was Product from static file
+import type { ProductRow } from "@/types";
 import { formatCurrency, cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/Badge";
 
 export type ProductCardProps = {
-  product: ProductRow;                              // ← was Product
+  product: ProductRow;
 };
 
 export function ProductCard({ product }: ProductCardProps) {
@@ -28,7 +28,7 @@ export function ProductCard({ product }: ProductCardProps) {
             <Badge className="absolute left-3 top-3 z-10 shadow-sm">{product.badge}</Badge>
           )}
           <Image
-            src={product.image_url ?? "/placeholder.jpg"}  /* ← was product.image */
+            src={product.image_url ?? "/placeholder.jpg"}
             alt={product.name}
             fill
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
@@ -40,10 +40,10 @@ export function ProductCard({ product }: ProductCardProps) {
             {product.name}
           </h3>
           <p className="hidden text-xs font-medium uppercase tracking-wide text-stone-400 md:block">
-            {product.category}
+            {product.category ?? ""}
           </p>
           <p className="hidden text-sm leading-relaxed text-stone-500 line-clamp-2 md:block">
-            {product.description}
+            {product.description ?? ""}
           </p>
           <p className="mt-auto pt-1 font-display text-base font-bold text-brand-orange sm:text-lg">
             {formatCurrency(product.price)}
