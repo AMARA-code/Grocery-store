@@ -24,8 +24,8 @@ export interface Product {
   name: string;
   price: number;
   category: string | null;
-  description: string;
-  image_url: string;
+  description: string | null;
+  image_url: string | null;
   badge?: string | null;
   stock?: number;
   created_at?: string;
