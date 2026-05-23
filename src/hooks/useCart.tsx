@@ -9,7 +9,7 @@ import {
   ReactNode
 } from "react";
 import type { Product } from "@/types";
-import { loadFromStorage, saveToStorage } from "../utils/storage";
+import { loadFromStorage, saveToStorage } from "../../utils/storage";
 
 export interface CartItem {
   id: string;
