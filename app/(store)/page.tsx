@@ -7,6 +7,22 @@ import { motion, AnimatePresence, useScroll, useTransform, useInView, type Varia
 import { products } from "@/src/data/products";
 import { ProductGrid } from "@/components/store/ProductGrid";
 import { Button } from "@/components/ui/Button";
+import type { ProductRow } from "@/types";
+
+// Adapter: converts local Product (image) → ProductRow (image_url)
+function toProductRow(p: (typeof products)[number]): ProductRow {
+  return {
+    id: p.id,
+    name: p.name,
+    price: p.price,
+    category: p.category,
+    description: p.description,
+    image_url: p.image,
+    badge: p.badge ?? null,
+    stock: 99,
+    created_at: new Date().toISOString(),
+  };
+}
 
 /* ══════════════════════════════════════════
    DATA
@@ -384,7 +400,7 @@ export default function HomePage() {
           <motion.div variants={fadeUp}><Button href="/products" variant="ghost">View all →</Button></motion.div>
         </div>
         <motion.div variants={scaleIn}>
-          <ProductGrid products={products.slice(0, 3)} className="sm:grid-cols-3" />
+<ProductGrid products={products.slice(0, 3).map(toProductRow)} className="sm:grid-cols-3" />
         </motion.div>
       </motion.section>
 
@@ -510,7 +526,7 @@ export default function HomePage() {
           <motion.div variants={fadeUp}><Button href="/products" variant="ghost">Browse all →</Button></motion.div>
         </div>
         <motion.div variants={scaleIn}>
-          <ProductGrid products={products.slice(3, 6)} className="sm:grid-cols-3" />
+ <ProductGrid products={products.slice(3, 6).map(toProductRow)} className="sm:grid-cols-3" />
         </motion.div>
       </motion.section>
 
