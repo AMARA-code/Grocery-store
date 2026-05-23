@@ -17,13 +17,11 @@ type Order = Awaited<ReturnType<typeof getAdminOrders>>[number];
 // Helpers
 // ─────────────────────────────────────────────────────────────────────────────
 
+import { formatCurrency as formatCurrencyUSD } from "@/lib/utils";
+
 function formatCurrency(amount: number | null) {
   if (amount == null) return "—";
-  return new Intl.NumberFormat("en-PK", {
-    style: "currency",
-    currency: "PKR",
-    maximumFractionDigits: 0,
-  }).format(amount);
+  return formatCurrencyUSD(amount);
 }
 
 function StatusBadge({ status }: { status: string }) {

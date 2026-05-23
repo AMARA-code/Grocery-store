@@ -10,7 +10,7 @@ export type CheckoutLineItem = {
 };
 
 export type PlaceOrderInput = {
-  userId: string;
+  userId: string | null;
   items: CheckoutLineItem[];
   shipping: {
     name: string;

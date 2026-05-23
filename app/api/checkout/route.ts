@@ -75,9 +75,7 @@ export async function POST(request: Request) {
 
   const supabase = await createSupabaseServerClient();
   const { data: { user } } = await supabase.auth.getUser();
-  if (!user) {
-    return NextResponse.json({ error: "Sign in to checkout" }, { status: 401 });
-  }
+  const userId = user?.id ?? null;
 
   // ── Validate promo code ───────────────────────────────────────────────────
   let discount = 0;
@@ -90,10 +88,11 @@ export async function POST(request: Request) {
     }
 
     if (promo.firstOrderOnly) {
+      // Check if this customer (by email) has made any orders before
       const { count } = await supabase
         .from("orders")
         .select("id", { count: "exact", head: true })
-        .eq("user_id", user.id);
+        .or(`customer_email.eq.${parsed.shipping.email},guest_email.eq.${parsed.shipping.email}`);
 
       if ((count ?? 0) > 0) {
         return NextResponse.json(
@@ -113,7 +112,7 @@ export async function POST(request: Request) {
 
   try {
     const { orderId, total, originalTotal } = await placeOrder(supabase, {
-      userId: user.id,
+      userId,
       items: parsed.items,
       shipping: parsed.shipping,
       paymentMethod: parsed.paymentMethod,
