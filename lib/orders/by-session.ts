@@ -13,7 +13,7 @@ export async function getOrderByStripeSession(
   sessionId: string,
   userId: string
 ): Promise<OrderConfirmationData | null> {
-  const supabase = createSupabaseServerClient();
+  const supabase = await createSupabaseServerClient(); // ✅ added await
 
   const { data: order, error } = await supabase
     .from("orders")
