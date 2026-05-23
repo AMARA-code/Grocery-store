@@ -42,7 +42,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
     saveToStorage(STORAGE_KEY, items);
   }, [items]);
 
-  const addToCart = (product: ProductRow, quantity = 1) => {  // ← was Product
+  const addToCart = (product: Product, quantity = 1) => {
     setItems((prev) => {
       const existing = prev.find((item) => item.id === product.id);
       if (existing) {
