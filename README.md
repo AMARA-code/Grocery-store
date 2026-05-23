@@ -1,14 +1,14 @@
 # FreshCart – Grocery E‑commerce
 
-It is a modern **grocery e‑commerce storefront** built with **React, TypeScript, and Vite**. It provides a complete browse → details → cart → checkout → order confirmation flow suitable for real-world online grocery stores.
+It is a modern **grocery e‑commerce storefront** built with **Next.js, React, and TypeScript**. It provides a complete browse → details → cart → checkout → order confirmation flow suitable for full-stack storefronts.
 
 ## Tech stack
 
-- React + TypeScript + Vite
-- React Router
+- Next.js + React + TypeScript
+- Supabase / Stripe integration
 - LocalStorage cart persistence
 - React Hot Toast for notifications
-- Modern responsive CSS (no CSS framework)
+- Tailwind CSS for styling
 
 ## Getting started
 
@@ -18,13 +18,13 @@ npm install
 npm run dev
 ```
 
-Then open the printed local URL (usually `http://localhost:5173`).
+Then open the printed local URL (usually `http://localhost:3000`).
 
 ## Available scripts
 
-- **`npm run dev`**: Start the Vite dev server
-- **`npm run build`**: Build for production
-- **`npm run preview`**: Preview the production build locally
+- **`npm run dev`**: Start the Next.js development server
+- **`npm run build`**: Build the Next.js production app
+- **`npm run start`**: Start the Next.js production server
 
 ## Features
 

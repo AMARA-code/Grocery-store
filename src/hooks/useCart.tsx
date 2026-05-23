@@ -8,14 +8,14 @@ import {
   useState,
   ReactNode
 } from "react";
-import type { ProductRow } from "@/types";            // ← was Product from static file
+import type { Product } from "@/types";
 import { loadFromStorage, saveToStorage } from "../utils/storage";
 
 export interface CartItem {
   id: string;
   name: string;
   price: number;
-  image_url: string;                                  // ← was image
+  image_url: string;
   quantity: number;
 }
 
@@ -23,7 +23,7 @@ interface CartContextValue {
   items: CartItem[];
   totalItems: number;
   totalPrice: number;
-  addToCart: (product: ProductRow, quantity?: number) => void;  // ← was Product
+  addToCart: (product: Product, quantity?: number) => void;
   removeFromCart: (id: string) => void;
   updateQuantity: (id: string, quantity: number) => void;
   clearCart: () => void;
