@@ -39,7 +39,7 @@ export function CartView() {
               >
                 <div className="relative h-24 w-24 shrink-0 overflow-hidden rounded-xl bg-gray-50">
                   <Image
-                    src={item.image}
+                    src={item.image_url}
                     alt={item.name}
                     fill
                     sizes="96px"

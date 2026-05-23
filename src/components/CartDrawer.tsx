@@ -25,21 +25,14 @@ function CartDrawer({ isOpen, onClose }: Props) {
 
   return (
     <div
-      className={
-        isOpen ? "cart-drawer-overlay cart-drawer-open" : "cart-drawer-overlay"
-      }
+      className={isOpen ? "cart-drawer-overlay cart-drawer-open" : "cart-drawer-overlay"}
       aria-hidden={!isOpen}
       onClick={handleOverlayClick}
     >
       <div className="cart-drawer">
         <header className="cart-drawer-header">
           <h2>Your cart</h2>
-          <button
-            type="button"
-            className="cart-drawer-close"
-            onClick={onClose}
-            aria-label="Close cart"
-          >
+          <button type="button" className="cart-drawer-close" onClick={onClose} aria-label="Close cart">
             ×
           </button>
         </header>
@@ -50,35 +43,17 @@ function CartDrawer({ isOpen, onClose }: Props) {
             <ul className="cart-list">
               {items.map((item) => (
                 <li key={item.id} className="cart-item">
-                  <img src={item.image} alt={item.name} />
+                  <img src={item.image_url} alt={item.name} />
                   <div className="cart-item-info">
                     <h3>{item.name}</h3>
                     <p>{formatCurrency(item.price)}</p>
                     <div className="cart-item-controls">
                       <div className="cart-qty">
-                        <button
-                          type="button"
-                          onClick={() =>
-                            updateQuantity(item.id, item.quantity - 1)
-                          }
-                        >
-                          −
-                        </button>
+                        <button type="button" onClick={() => updateQuantity(item.id, item.quantity - 1)}>−</button>
                         <span>{item.quantity}</span>
-                        <button
-                          type="button"
-                          onClick={() =>
-                            updateQuantity(item.id, item.quantity + 1)
-                          }
-                        >
-                          +
-                        </button>
+                        <button type="button" onClick={() => updateQuantity(item.id, item.quantity + 1)}>+</button>
                       </div>
-                      <button
-                        type="button"
-                        className="cart-remove"
-                        onClick={() => removeFromCart(item.id)}
-                      >
+                      <button type="button" className="cart-remove" onClick={() => removeFromCart(item.id)}>
                         Remove
                       </button>
                     </div>
@@ -108,4 +83,3 @@ function CartDrawer({ isOpen, onClose }: Props) {
 }
 
 export default CartDrawer;
-
