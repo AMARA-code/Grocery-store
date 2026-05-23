@@ -410,7 +410,7 @@ function StatsBar({ orders }: { orders: Order[] }) {
       ))}
       <div className="rounded-xl bg-gray-900 px-4 py-3">
         <p className="text-2xl font-bold text-white">
-          {new Intl.NumberFormat("en-PK", { style: "currency", currency: "PKR", maximumFractionDigits: 0 }).format(totalRevenue)}
+          {formatCurrencyUSD(totalRevenue)}
         </p>
         <p className="text-xs text-gray-400 font-medium mt-0.5">Revenue counted</p>
       </div>
