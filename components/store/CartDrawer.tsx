@@ -17,7 +17,6 @@ export function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
   const { items, totalPrice, updateQuantity, removeFromCart } = useCart();
   const router = useRouter();
 
-  /* ── Prevent hydration mismatch — cart reads localStorage ── */
   const [mounted, setMounted] = useState(false);
   useEffect(() => { setMounted(true); }, []);
 
@@ -26,7 +25,6 @@ export function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
     router.push("/checkout");
   };
 
-  /* Show empty state until mounted so server & first client paint match */
   const cartItems = mounted ? items : [];
   const cartTotal = mounted ? totalPrice : 0;
 
@@ -103,7 +101,7 @@ export function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
                 >
                   <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-xl bg-cream-100">
                     <Image
-                      src={item.image}
+                      src={item.image_url}
                       alt={item.name}
                       fill
                       sizes="80px"
@@ -118,7 +116,6 @@ export function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
                       {formatCurrency(item.price)}
                     </p>
                     <div className="mt-2 flex flex-wrap items-center gap-2">
-                      {/* Qty stepper */}
                       <div className="flex items-center rounded-full border border-sage-200 bg-cream-50">
                         <button
                           type="button"
